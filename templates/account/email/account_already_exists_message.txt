@@ -1,0 +1,13 @@
+{% extends "account/email/base_message.txt" %}
+{% load i18n %}
+
+{% block content %}{% autoescape off %}{% blocktrans %}Estás recibiendo este correo electrónico porque tú u otra persona intentó registrarse para recibir una
+cuenta usando la dirección de correo electrónico:
+
+{{ email }}
+
+Sin embargo, ya existe una cuenta que utiliza esa dirección de correo electrónico. 
+En caso de que lo haya olvidado, utilice el procedimiento de olvido de contraseña 
+para recuperar su cuenta:
+
+{{ password_reset_url }}{% endblocktrans %}{% endautoescape %}{% endblock content %}

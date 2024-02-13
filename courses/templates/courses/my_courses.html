@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<section class="min-h-screen">
+    <div class="bg-gray-900 p-16">
+        <h2 class="max-w-screen-xl mx-auto text-white font-bold text-5xl">Mis cursos</h2>
+    </div>
+    <div class="mt-16">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mx-auto max-w-screen-xl">
+            {% for course in courses %}
+            <a href="{% url 'courses:course-detail' pk=course.pk %}" class="rounded-3xl overflow-hidden shadow-2xl p-5 flex flex-col">
+                <img class="w-full rounded-3xl block" src="{{ course.picture.url }}" alt="{{ course.title }}">
+                <div class="flex justify-between flex-col mt-0 h-full">
+                    <div class="font-bold text-xl mb-2">{{ course.title }}</div>
+                    <div>
+                        <hr>
+                        <div class="flex justify-between mt-4 items-center text-gray-500">
+                            <div>
+                                S/{{ course.price }}
+                            </div>
+                            <div class="">
+                                {{ course.get_level_display }}
+                            </div>
+                        </div>
+                    </div>
+                </div>            
+            </a>
+            {% endfor %}
+        </div>
+        {% if courses %}
+        {% else %}
+        <h1 class="text-4xl mx-auto max-w-screen-xl">Usted aun no ha comprado algun curso</h1>
+        {% endif %}
+    </div>
+</section>
+{% endblock content %}

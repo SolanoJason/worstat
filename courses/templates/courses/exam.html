@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="">
+    <div class="bg-gray-900 p-16">
+        <h2 class="max-w-screen-xl mx-auto text-white font-bold text-5xl">{{ course.title }} - Examen de certificacion </h2>
+    </div>
+    <div class="mt-16 max-w-screen-xl mx-auto">
+        <form method="post" action="{% url 'courses:exam' course.id %}">
+            {% csrf_token %}
+            {% for question in questions %}
+              <div class="mb-16">
+                <h3 class="mb-4 font-semibold text-gray-900 text-2xl">{{ question.question }}</h3>
+                <ul class="w-full text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg">
+                  {% for answer in question.answer_set.all %}
+                    <li class="w-full border-b border-gray-200 rounded-t-lg hover:bg-slate-100">
+                      <div class="flex items-center ps-3">
+                        <input type="radio" id="answer{{ answer.id }}" name="question{{ question.id }}" value="{{ answer.id }}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500">
+                        <label for="answer{{ answer.id }}" class="w-full py-3 ms-2 text-lg text-gray-900">{{ answer.answer }}</label>
+                      </div>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endfor %}
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Enviar Respuestas</button>
+        </form>
+</section>
+{% endblock %}

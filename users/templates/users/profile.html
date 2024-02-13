@@ -1,0 +1,40 @@
+{% extends 'base.html' %} 
+{% load widget_tweaks %} 
+{% block content %}
+<section class="min-h-screen">
+    <div class="bg-gray-900 p-16">
+        <h2 class="max-w-screen-xl mx-auto text-white font-bold text-5xl">Perfil</h2>
+    </div>
+    <div class="max-w-screen-xl mx-auto bg-white p-8 flex">
+        <!-- User Information -->
+        <div class="w-1/2">
+            <h2 class="font-bold text-2xl mb-4">Imagen del perfil</h2>
+            <img src="{% if user.picture %}{{ user.picture.url }}{% else %}https://via.placeholder.com/150{% endif %}" alt="Profile Picture" class="w-3/4 mx-auto">
+            {{ form.picture|attr:"form:perfil-form" }}
+        </div>
+        <!-- Profile Picture Upload -->
+        <form class="w-1/2 flex flex-col space-y-4" method="post" action="" enctype="multipart/form-data" id="perfil-form">
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
+                        <span class="font-medium">{{message}}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {{ form.non_field_errors }}
+                
+                {% csrf_token %}
+            {% for field in form %}
+                {% if field.name != 'picture' %}
+                <label for="{{ field.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900">{{ field.label }}</label>
+                {{ field|add_class:"bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-purple-600 focus:border-purple-600 block w-full p-2.5" }}
+                {{ field.errors }}
+                {% endif %}
+            {% endfor %}
+            <button type="submit" class="bg-indigo-500 text-white px-4 py-2 rounded-md">Actualizar perfil</button>
+        </form>
+    </div>
+</section>
+{% endblock content %}
