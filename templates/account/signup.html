@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load widget_tweaks %} 
+{% load allauth i18n %}
+{% load allauth socialaccount %}
+{% block head_title %}
+    {% trans "Signup" %}
+{% endblock head_title %}
+{% block content %}
+<section class="bg-gray-50">
+	<div
+		class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-[calc(100vh-5rem)] lg:py-0"
+	>
+		<div class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0">
+			<div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+				<h1
+					class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl"
+				>
+					Registrate y comienza a aprender
+				</h1>
+				{% if messages %}
+					<ul class="messages">
+						{% for message in messages %}
+                        <li class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
+                            <span class="font-medium">{{message}}</span>
+                        </li>
+						{% endfor %}
+					</ul>
+                {% endif %}
+				<form class="space-y-4 md:space-y-6" action="{% url 'account_signup' %}" method="POST">
+					{% csrf_token %}
+					{% for field in form %}
+					<div>
+						<label for="{{ field.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900">{{ field.label }}</label>
+						{% if field.errors %}
+							{{ field|add_class:"bg-gray-50 border border-red-300 text-gray-900 sm:text-sm rounded-lg focus:ring-red-600 focus:border-red-600 block w-full p-2.5" }}
+							{% for error in field.errors %}
+								<div class="text-red-700 mt-4 text-sm">{{ error }}</div>
+							{% endfor %}
+						{% else %}
+							{{ field|add_class:"bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5" }}
+						{% endif %}
+					</div>
+					{% endfor %}
+					<button
+						type="submit"
+						class="w-full text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 text-center"
+					>
+						Registrarse
+					</button>
+					<p class="text-sm font-light text-gray-500">
+						Ya tienes una cuenta?
+						<a href="{{ login_url }}" class="font-medium text-blue-400 hover:underline"
+							>Inicia sesión aquí</a
+						>
+					</p>
+                    {% if redirect_field_value %}
+                        <input type="hidden"
+                            name="{{ redirect_field_name }}"
+                            value="{{ redirect_field_value }}" />
+                    {% endif %}
+				</form>
+                {% if SOCIALACCOUNT_ENABLED %}
+					{% include 'socialaccount/snippets/google.html' %}
+                {% endif %}
+			</div>
+		</div>
+	</div>
+</section>
+{% endblock content %}

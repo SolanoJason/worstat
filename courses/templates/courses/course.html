@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %} 
+{% block content %}
+<section class="bg-gray-700">
+    <div class="max-w-screen-xl mx-auto text-white p-6 flex flex-wrap">
+        <div class="w-1/2">
+            <h1 class="text-3xl font-bold mb-4">{{ course.title }}</h1>
+            <p class="text-lg mb-4">{{ course.description }}</p>
+            <div class="mb-4">
+                <div class="text-xs">Publicado el: {{ course.published_date }}</div>
+            </div>
+            <div class="text-2xl font-bold mb-4">
+                S/{{ course.price }}
+            </div>
+            <div>
+                {% if user in course.users.all %}
+                    {% if is_completed %}
+                    <a href="{% url 'courses:certificate-pdf' pk=course.pk %}" class="text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 sm:mr-2 lg:mr-4 focus:outline-none">
+                        Ver certificado
+                    </a>
+                    {% else %}
+                    <a href="{% url 'courses:exam' course_id=course.pk %}" class="text-white items-center w-40 flex justify-center bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-3 lg:py-2.5 sm:mr-2 lg:mr-0 focus:outline-none">
+                        Tomar examen de certificacion
+                    </a>
+                    {% endif %}
+                {% else %}
+                <div id="wallet_container"></div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="w-1/2">
+            <img class="object-contain w-full h-60 mb-4" src="{{ course.picture.url }}" alt="{{ course.title }}">
+            <div class="flex text-center text-2xl justify-center items-center space-x-4 h-16">
+                <i class="fa-brands fa-whatsapp text-green-400"></i>
+                <div>
+                    964057771
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="bg-white">
+    <div class="p-6 mx-auto flex space-y-4 flex-col max-w-screen-xl">
+        <h3 class="font-bold text-xl">
+           Este curso incluye: 
+        </h3>
+        <ul class="flex flex-col space-y-1">
+            <li>
+                <div class="flex space-x-4">
+                    <div class="w-6 flex justify-center items-center">
+                        <i class="fa-solid fa-circle-play"></i>
+                    </div>
+                    <span>{{ course.get_duration_display }} de video bajo demanda</span>
+                </div>
+            </li>
+            <li>
+                <div class="flex space-x-4">
+                    <div class="w-6 flex justify-center items-center">
+                        <i class="fa-solid fa-mobile-screen-button"></i>
+                    </div>
+                    <span>Acceso en dispositivos moviles y TV</span>
+                </div>
+            </li>
+            <li>
+                <div class="flex space-x-4">
+                    <div class="w-6 flex justify-center items-center">
+                        <i class="fa-solid fa-infinity"></i>
+                    </div>
+                    <span>Acceso de por vida</span>
+                </div>
+            </li>
+            <li>
+                <div class="flex space-x-4">
+                    <div class="w-6 flex justify-center items-center">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <span>Certificado de finalización</span>
+                </div>
+            </li>
+        </ul>
+    </div>
+</section>
+<section>
+    <div class="flex flex-col mx-auto p-6 pt-0 space-y-4 max-w-screen-xl" data-accordion="open" data-active-classes="text-black" data-inactive-classes="text-black"> 
+        <h3 class="font-bold text-xl">Contenido del curso</h3>
+        <div>
+            {{ course.section_set.count }} secciones | {{ course.get_num_episodes }} clases | {{ course.get_duration_display }} de duracion total
+        </div>
+        <div class="flex flex-col">
+            {% for section in course.section_set.all %}
+            <button class="flex space-x-4 bg-gray-100 p-4 items-center" data-accordion-target="#section-{{ section.pk }}">
+                <div class="w-6 flex justify-center items-center">
+                    <i class="fa-solid fa-chevron-down text-xs"></i>
+                </div>
+                <div>
+                    {{ section.title }}
+                </div>
+            </button>
+            <div id="section-{{ section.pk }}" class="hidden">
+                {% for episode in section.episode_set.all %}
+                    <div class="flex space-x-4 p-4 items-center justify-between w-full">
+                        <div class="flex space-x-4 items-center hover:cursor-pointer {% if episode.free or user in course.users.all %}text-blue-500 hover:cursor-pointer{% else %}{% endif %}" data-modal-target="section-{{ section.pk }}-episode-{{ episode.pk }}" data-modal-toggle="section-{{ section.pk }}-episode-{{ episode.pk }}">
+                            <i class="fa-solid fa-circle-play"></i>
+                            <a class="{% if episode.free or user in course.users.all %}text-blue-500 hover:cursor-pointer{% else %}{% endif %}" >{{ episode.title }}</a>
+                        </div>
+                        {% if episode.file %}
+                        <a class="flex items-center text-blue-500 border text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2" href="{{ episode.file.url }}" download="">
+                            <i class="fa-solid fa-download"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% if episode.free or user in course.users.all %}
+                    <div id="section-{{ section.pk }}-episode-{{ episode.pk }}" tabindex="-1" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                        <div class="relative w-full max-w-4xl max-h-full">
+                            <!-- Modal content -->
+                            <div class="relative bg-white rounded-lg shadow">
+                                <!-- Modal header -->
+                                <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t ">
+                                    <h3 class="text-xl font-medium text-gray-900">
+                                        {{ episode.title }} 
+                                    </h3>
+                                    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center  " data-modal-hide="section-{{ section.pk }}-episode-{{ episode.pk }}">
+                                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                                        </svg>
+                                        <span class="sr-only">Close modal</span>
+                                    </button>
+                                </div>
+                                <!-- Modal body -->
+                                <div class="p-4 md:p-5 space-y-4">
+                                    <video controls preload="none" class="w-full h-auto max-w-full border border-gray-200 rounded-md" controlsList="nodownload">
+                                        <source src="{{ episode.video.url }}" type="video/mp4">
+                                    </video>
+                                </div>
+                                <!-- Modal footer -->
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>  
+    </div>
+</section>
+<section class="bg-white  py-8 lg:py-16 antialiased">
+    <div class="max-w-2xl mx-auto px-4">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-lg lg:text-2xl font-bold text-gray-900 ">Comentarios</h2>
+      </div>
+      <form class="mb-6 space-y-4" method="POST" action="">
+        {% csrf_token %}
+        {% for field in form %}
+                {% if field.name != 'picture' %}
+                {{ field|add_class:"bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-purple-600 focus:border-purple-600 block w-full p-2.5"|attr:"placeholder:Escribe un comentario" }}
+                {{ field.errors }}
+                {% endif %}
+        {% endfor %}
+          <button type="submit"
+              class="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-purple-700 rounded-lg focus:ring-4 focus:ring-purple-200  hover:bg-purple-800">
+              Post comment
+          </button>
+      </form>
+      {% for review in reviews %}
+      <article class="p-6 text-base bg-white rounded-lg ">
+        <footer class="flex justify-between items-center mb-2">
+            <div class="flex items-center">
+                <p class="inline-flex items-center mr-3 text-sm text-gray-900  font-semibold"><img
+                        class="mr-2 w-6 h-6 rounded-full"
+                        src="https://flowbite.com/docs/images/people/profile-picture-2.jpg"
+                        alt="Michael Gough">{{ review.user }}</p>
+                <p class="text-sm text-gray-600 "><time pubdate datetime="2022-02-08"
+                        title="February 8th, 2022">{{ review.created }}</time></p>
+            </div>
+            <!-- <button id="dropdownComment1Button" data-dropdown-toggle="dropdownComment1"
+                class="inline-flex items-center p-2 text-sm font-medium text-center text-gray-500  bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50   "
+                type="button">
+                <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 3">
+                    <path d="M2 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6.041 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM14 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z"/>
+                </svg>
+                <span class="sr-only">Comment settings</span>
+            </button> -->
+            <!-- Dropdown menu -->
+            <!-- <div id="dropdownComment1"
+                class="hidden z-10 w-36 bg-white rounded divide-y divide-gray-100 shadow  ">
+                <ul class="py-1 text-sm text-gray-700 "
+                    aria-labelledby="dropdownMenuIconHorizontalButton">
+                    <li>
+                        <a href="#"
+                            class="block py-2 px-4 hover:bg-gray-100  ">Edit</a>
+                    </li>
+                    <li>
+                        <a href="#"
+                            class="block py-2 px-4 hover:bg-gray-100  ">Remove</a>
+                    </li>
+                    <li>
+                        <a href="#"
+                            class="block py-2 px-4 hover:bg-gray-100  ">Report</a>
+                    </li>
+                </ul>
+            </div> -->
+        </footer>
+        <p class="text-gray-500 ">{{ review.comment }}</p>
+    </article>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock content %}
+{% block script %}
+{% if user in course.users.all %}
+{% else %}
+<script src="https://sdk.mercadopago.com/js/v2"></script>
+<script>
+    const mp = new MercadoPago('{{PUBLIC_KEY}}');
+    const bricksBuilder = mp.bricks();
+    mp.bricks().create("wallet", "wallet_container", {
+        initialization: {
+            preferenceId: "{{preference.id}}"
+        },
+        customization: {
+            texts: {
+                valueProp: 'smart_option',
+            },
+        },
+    })
+</script>
+{% endif %}
+{% endblock script %}
+
