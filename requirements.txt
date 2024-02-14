@@ -60,7 +60,7 @@ Pillow==10.1.0
 pip==24.0
 proglog==0.1.9
 prompt-toolkit==3.0.42
-psycopg2==2.9.9
+psycopg2-binary
 pure-eval==0.2.2
 pycparser==2.21
 pydyf==0.8.0
