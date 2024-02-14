@@ -24,7 +24,6 @@ urlpatterns = [
     path('', include('courses.urls')),
     path('users/', include('users.urls')),
     path('accounts/', include('allauth.urls')),
-    path("__reload__/", include("django_browser_reload.urls")),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
