@@ -121,10 +121,10 @@ class Episode(models.Model):
     title = models.CharField(max_length=255)
     section = models.ForeignKey(Section, on_delete=models.CASCADE)
     order = models.PositiveSmallIntegerField("Orden")
-    video = models.FileField('Video', upload_to=get_upload_to, max_length=300)
+    video = models.FileField('Video', upload_to=get_upload_to, max_length=500)
     duration = models.PositiveIntegerField("Duracion", default=0)
     free = models.BooleanField("Gratis", default=False)
-    file = models.FileField("Archivo", upload_to=get_upload_file_to, max_length=100, null=True, blank=True)
+    file = models.FileField("Archivo", upload_to=get_upload_file_to, max_length=500, null=True, blank=True)
 
     def __str__(self) -> str:
         return f'{self.section}:{self.order}-{self.title}'
