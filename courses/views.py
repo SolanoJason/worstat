@@ -1,6 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
-from rest_framework import generics
 from .models import Course, Section, Review, Question, Answer, Enrollment
 from django.views.generic import ListView, DetailView, CreateView
 from .forms import ReviewForm
