@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load widget_tweaks %}
 {% block content %}
 <!-- Start block -->
 <section class="bg-white">
@@ -19,7 +20,7 @@
             {% endif %}
         </div>
         <div class="hidden lg:mt-0 lg:col-span-5 lg:flex">
-            <img src="{% static 'img/hero.jpg' %}" alt="hero image">
+            <img src="{% static 'img/hero2.png' %}" alt="hero image">
         </div>                
     </div>
 </section>
@@ -30,7 +31,9 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mx-auto max-w-screen-xl">
         {% for course in courses %}
         <a href="{% url 'courses:course-detail' pk=course.pk %}" class="rounded-3xl overflow-hidden shadow-2xl p-5 flex flex-col">
-            <img class="w-full rounded-3xl block" src="{{ course.picture.url }}" alt="{{ course.title }}">
+            <div>
+                <img class="rounded-3xl w-full h-48" src="{{ course.picture.url }}" alt="{{ course.title }}">
+            </div>
             <div class="flex justify-between flex-col mt-0 h-full">
                 <div class="font-bold text-xl mb-2">{{ course.title }}</div>
                 <div>
@@ -466,18 +469,19 @@
 <section class="bg-white" id="contact">
     <div class="py-8 lg:py-16 px-4 mx-auto max-w-screen-md">
         <h2 class="mb-4 text-4xl tracking-tight font-extrabold text-center text-gray-900 ">Contactanos</h2>
-        <form action="#" class="space-y-8">
+        <form action="" class="space-y-8" method="POST">
+            {% csrf_token %}
             <div>
-                <label for="email" class="block mb-2 text-sm font-medium text-gray-900 ">Tu correo electronico</label>
-                <input type="email" id="email" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5       " placeholder="name@gmail.com" required>
+                <label for="email" class="block mb-2 text-sm font-medium text-gray-900 ">{{ form.email.label }}</label>
+                {{ form.email|add_class:"shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5"|attr:"placeholder:name@gmail.com" }}
             </div>
             <div>
-                <label for="subject" class="block mb-2 text-sm font-medium text-gray-900 ">A cerca de</label>
-                <input type="text" id="subject" class="block p-3 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 shadow-sm focus:ring-purple-500 focus:border-purple-500       " placeholder="Como podemos ayudarte" required>
+                <label for="subject" class="block mb-2 text-sm font-medium text-gray-900 ">{{ form.about.label }}</label>
+                {{ form.about|add_class:"block p-3 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 shadow-sm focus:ring-purple-500 focus:border-purple-500"|attr:"placeholder:Como podemos ayudarte" }}
             </div>
             <div class="sm:col-span-2">
-                <label for="message" class="block mb-2 text-sm font-medium text-gray-900 ">Tu mensaje</label>
-                <textarea id="message" rows="6" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg shadow-sm border border-gray-300 focus:ring-purple-500 focus:border-purple-500      " placeholder="Dejanos un mensaje"></textarea>
+                <label for="message" class="block mb-2 text-sm font-medium text-gray-900 ">{{ form.message.label }}</label>
+                {{ form.message|add_class:"block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg shadow-sm border border-gray-300 focus:ring-purple-500 focus:border-purple-500"|attr:"placeholder:Dejanos un mensaje"|attr:"rows:6" }}
             </div>
             <button type="submit" class="flex justify-center mx-auto py-3 px-5 text-sm font-medium text-center text-white rounded-lg bg-purple-700 sm:w-fit hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-purple-300">Enviar mensaje</button>
         </form>

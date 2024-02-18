@@ -251,7 +251,7 @@ ACCOUNT_LOGIN_ON_PASSWORD_RESET = True
 MERCADO_PAGO_ACCESS_TOKEN = config('MERCADO_PAGO_ACCESS_TOKEN')
 MERCADO_PAGO_PUBLIC_KEY = config('MERCADO_PAGO_PUBLIC_KEY')
 
-CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000', config('PROD_TRUSTED_ORIGIN'), 'https://api.mercadopago.com']
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000', 'https://www.worstat.com', 'https://api.mercadopago.com']
 
 #AWS
 

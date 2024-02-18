@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from .models import Course, Section, Review, Question, Answer, Enrollment
 from django.views.generic import ListView, DetailView, CreateView
-from .forms import ReviewForm
+from .forms import ReviewForm, ContactForm
 import mercadopago
 from django.http import HttpResponse
 from django.conf import settings
@@ -15,14 +15,24 @@ from django_weasyprint.views import WeasyTemplateResponse
 from django_weasyprint.utils import django_url_fetcher
 from django.utils import timezone
 import ssl
+from users.models import Contact
 
-class IndexView(ListView):
+class IndexView(CreateView):
     """
     Vista de administracion
     """
-    model = Course
+    model = Contact
+    form_class = ContactForm
     template_name = "courses/index.html"
-    context_object_name = "courses"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        courses = Course.objects.all()
+        context["courses"] = courses
+        return context
+
+    def get_success_url(self):
+        return reverse('courses:index')
 
 class CertificatePDFDetailView(DetailView):
     model = Enrollment
@@ -165,10 +175,36 @@ class ReviewCreateView(CreateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        
         course = Course.objects.get(pk=self.kwargs['pk'])
+        sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
+        preference_data = {
+            "items": [
+                {
+                    "id": course.pk,
+                    "title": course.title,
+                    "quantity": 1,
+                    "unit_price": float(course.price),
+                    "currency_id": "PEN",
+                }
+            ],
+            "back_urls": {
+                "success": settings.CSRF_TRUSTED_ORIGINS[1],
+                # "failure": "https://www.failure.com",
+                # "pending": "https://www.pending.com"
+            },
+            "auto_return": "approved",
+            "notification_url": f"{settings.CSRF_TRUSTED_ORIGINS[1]}/course/mercado_pago_webhook/",
+            "expires": False,
+            "statement_descriptor": "Worstat",
+            "binary_mode": True,
+        }
+        preference_response = sdk.preference().create(preference_data)
+        preference = preference_response["response"]
+        print(preference)
         context["course"] = course
         context["reviews"] = Review.objects.filter(course=course)
-        context['preference'] = json.loads(course.preference)
+        context['preference'] = preference
         context['PUBLIC_KEY'] = settings.MERCADO_PAGO_PUBLIC_KEY
         if self.request.user.is_authenticated:
             context['is_completed'] = self.request.user.enrollment_set.filter(course=course, is_completed=True).exists()

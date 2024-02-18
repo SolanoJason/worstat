@@ -54,3 +54,12 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self) -> str:
         return f'{self.email}'
+
+class Contact(models.Model):
+    email = models.EmailField("Correo electronico")
+    about = models.CharField(max_length=255, verbose_name='A cerca de')
+    message = models.TextField(verbose_name='Mensage')
+
+    class Meta:
+        verbose_name = 'Contacto'
+        verbose_name_plural = 'Contactos'

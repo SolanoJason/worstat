@@ -40,6 +40,9 @@ def update_course_preference(sender, instance, **kwargs):
             },
             "auto_return": "approved",
             "notification_url": f"{settings.CSRF_TRUSTED_ORIGINS[1]}/course/mercado_pago_webhook/",
+            "expires": False,
+            "statement_descriptor": "Worstat",
+            "binary_mode": True,
         }
         preference_response = sdk.preference().create(preference_data)
         preference = preference_response["response"]

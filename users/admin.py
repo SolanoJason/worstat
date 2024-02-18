@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Account
+from .models import Account, Contact
 from courses.models import Review, Course, Episode, Section, Enrollment, Answer, Question
 from django import forms
 
@@ -33,3 +33,4 @@ class QuestionAdmin(admin.ModelAdmin):
 
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Answer)
+admin.site.register(Contact)
