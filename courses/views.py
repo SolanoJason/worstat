@@ -109,7 +109,8 @@ def mercado_pago_webhook(request):
                 payments = order_response.get('payments')
                 print(f'{payments=}')
                 if payments[0].get('status') == 'approved':
-                    payer = order_response.get('payer')
+                    preference = sdk.preference().get(order_response.get('preference_id'))
+                    payer = preference.get('response').get('payer')
                     print(f'{payer=}')
                     payer_email = payer.get('email')
                     print(f'{payer_email=}')
