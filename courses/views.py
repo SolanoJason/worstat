@@ -8,6 +8,7 @@ from django.http import HttpResponse
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 import json
 import functools
 from django_weasyprint import WeasyTemplateResponseMixin
@@ -16,6 +17,9 @@ from django_weasyprint.utils import django_url_fetcher
 from django.utils import timezone
 import ssl
 from users.models import Contact
+
+sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
+User = get_user_model()
 
 class IndexView(CreateView):
     """
@@ -89,11 +93,27 @@ def mercado_pago_webhook(request):
     print("MERCADO PAGOOO")
     print(f'{request=}')
     if request.method == 'POST':
+        
         print(f'{request.POST=}')
         print(f'{request.GET=}')
         print(f'{request.__dict__=}')
         print(f'{request.headers=}')
         print(f'{request.META=}')
+        if request.GET.get('topic') == 'merchant_order':
+            id = request.GET.get('id')
+            order = sdk.merchant_order().get(id)
+            order_response = order.get('response')
+            if order_response.get('status') == 'closed':
+                payments = order_response.get('payments')
+                if payments[0].get('status') == 'approved':
+                    payer = order_response.get('payer')
+                    payer_email = payer.get('email')
+                    items = order_response.get('items')
+                    course_id = items[0].get('id')
+                    course = Course.objects.get(pk=course_id)
+                    user_payer = User.objects.get(email=payer_email)
+                    Enrollment.objects.create(user=user_payer, course=course)
+
         return HttpResponse(status=200, content='hola')
     else:
         return HttpResponse(status=405)
@@ -177,34 +197,39 @@ class ReviewCreateView(CreateView):
         context = super().get_context_data(**kwargs)
         
         course = Course.objects.get(pk=self.kwargs['pk'])
-        sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
-        preference_data = {
-            "items": [
-                {
-                    "id": course.pk,
-                    "title": course.title,
-                    "quantity": 1,
-                    "unit_price": float(course.price),
-                    "currency_id": "PEN",
-                }
-            ],
-            "back_urls": {
-                "success": settings.CSRF_TRUSTED_ORIGINS[1],
-                # "failure": "https://www.failure.com",
-                # "pending": "https://www.pending.com"
-            },
-            "auto_return": "approved",
-            "notification_url": f"{settings.CSRF_TRUSTED_ORIGINS[1]}/course/mercado_pago_webhook/",
-            "expires": False,
-            "statement_descriptor": "Worstat",
-            "binary_mode": True,
-        }
-        preference_response = sdk.preference().create(preference_data)
-        preference = preference_response["response"]
-        print(preference)
+        if self.request.user.is_authenticated:
+            
+            preference_data = {
+                "items": [
+                    {
+                        "id": course.pk,
+                        "title": course.title,
+                        "quantity": 1,
+                        "unit_price": float(course.price),
+                        "currency_id": "PEN",
+                    }
+                ],
+                "payer": {
+                    "name": self.request.user.full_name,
+                    "email": self.request.user.email,
+                },
+                "back_urls": {
+                    "success": settings.CSRF_TRUSTED_ORIGINS[1],
+                    # "failure": "https://www.failure.com",
+                    # "pending": "https://www.pending.com"
+                },
+                "auto_return": "approved",
+                "notification_url": f"{settings.CSRF_TRUSTED_ORIGINS[1]}/course/mercado_pago_webhook/",
+                "expires": False,
+                "statement_descriptor": "Worstat",
+                "binary_mode": True,
+            }
+            preference_response = sdk.preference().create(preference_data)
+            preference = preference_response["response"]
+            print(preference)
+            context['preference'] = preference
         context["course"] = course
         context["reviews"] = Review.objects.filter(course=course)
-        context['preference'] = preference
         context['PUBLIC_KEY'] = settings.MERCADO_PAGO_PUBLIC_KEY
         if self.request.user.is_authenticated:
             context['is_completed'] = self.request.user.enrollment_set.filter(course=course, is_completed=True).exists()
