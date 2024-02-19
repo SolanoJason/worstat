@@ -9,7 +9,9 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mx-auto max-w-screen-xl">
             {% for course in courses %}
             <a href="{% url 'courses:course-detail' pk=course.pk %}" class="rounded-3xl overflow-hidden shadow-2xl p-5 flex flex-col">
-                <img class="w-full rounded-3xl block" src="{{ course.picture.url }}" alt="{{ course.title }}">
+                <div>
+                    <img class="rounded-3xl w-full h-48" src="{{ course.picture.url }}" alt="{{ course.title }}">
+                </div>
                 <div class="flex justify-between flex-col mt-0 h-full">
                     <div class="font-bold text-xl mb-2">{{ course.title }}</div>
                     <div>
