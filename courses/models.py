@@ -79,6 +79,7 @@ class Enrollment(models.Model):
     class Meta:
         verbose_name = "Matricula"
         verbose_name_plural = "Matriculas"
+        unique_together = ["user", "course"]
 
     def __str__(self) -> str:
         return f'{self.user} enrolled in {self.course}'
