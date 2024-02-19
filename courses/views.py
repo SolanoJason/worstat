@@ -102,13 +102,19 @@ def mercado_pago_webhook(request):
         if request.GET.get('topic') == 'merchant_order':
             id = request.GET.get('id')
             order = sdk.merchant_order().get(id)
+            print(f'{order=}')
             order_response = order.get('response')
+            print(f'{order_response=}')
             if order_response.get('status') == 'closed':
                 payments = order_response.get('payments')
+                print(f'{payments=}')
                 if payments[0].get('status') == 'approved':
                     payer = order_response.get('payer')
+                    print(f'{payer=}')
                     payer_email = payer.get('email')
+                    print(f'{payer_email=}')
                     items = order_response.get('items')
+                    print(f'{items=}')
                     course_id = items[0].get('id')
                     course = Course.objects.get(pk=course_id)
                     user_payer = User.objects.get(email=payer_email)
@@ -226,7 +232,7 @@ class ReviewCreateView(CreateView):
             }
             preference_response = sdk.preference().create(preference_data)
             preference = preference_response["response"]
-            print(preference)
+            print(f'{preference=}')
             context['preference'] = preference
         context["course"] = course
         context["reviews"] = Review.objects.filter(course=course)
