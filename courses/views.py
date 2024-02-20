@@ -121,7 +121,32 @@ def mercado_pago_webhook(request):
                     user_payer = User.objects.get(email=payer_email)
                     Enrollment.objects.create(user=user_payer, course=course)
 
-        return HttpResponse(status=200, content='hola')
+                    return HttpResponse(status=200, content='merchant_order')
+        if request.GET.get('type') == 'payment':
+            id = request.GET.get('data.id')
+            payment = sdk.payment().get(id)
+            print(f'{payment=}')
+            payment_response = payment.get('response')
+            print(f'{payment_response=}')
+            order_id = payment_response.get('order').get('id')
+            order = sdk.merchant_order().get(order_id)
+            order_response = order.get('response')
+            print(f'{order=}')
+            if payment_response.get('status') == 'approved':
+                preference = sdk.preference().get(order_response.get('preference_id'))
+                payer = preference.get('response').get('payer')
+                print(f'{payer=}')
+                payer_email = payer.get('email')
+                print(f'{payer_email=}')
+                items = order_response.get('items')
+                print(f'{items=}')
+                course_id = items[0].get('id')
+                course = Course.objects.get(pk=course_id)
+                user_payer = User.objects.get(email=payer_email)
+                Enrollment.objects.create(user=user_payer, course=course)
+
+                return HttpResponse(status=200, content='payment')
+        return HttpResponse(status=400)
     else:
         return HttpResponse(status=405)
 
@@ -227,10 +252,13 @@ class ReviewCreateView(CreateView):
                 },
                 "auto_return": "approved",
                 "notification_url": f"{settings.CSRF_TRUSTED_ORIGINS[1]}/course/mercado_pago_webhook/",
-                "expires": False,
+                "expires": True,
                 "statement_descriptor": "Worstat",
                 "binary_mode": True,
                 "installments": 1,
+                "excluded_payment_types": [
+                    {"id": "ticket"}
+                ],
             }
             preference_response = sdk.preference().create(preference_data)
             preference = preference_response["response"]
