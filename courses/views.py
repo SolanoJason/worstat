@@ -230,6 +230,7 @@ class ReviewCreateView(CreateView):
                 "expires": False,
                 "statement_descriptor": "Worstat",
                 "binary_mode": True,
+                "installments": 1,
             }
             preference_response = sdk.preference().create(preference_data)
             preference = preference_response["response"]
