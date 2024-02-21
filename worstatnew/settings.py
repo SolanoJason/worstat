@@ -65,7 +65,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # django-tailwind
     "allauth.account.middleware.AccountMiddleware",
-    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'worstatnew.urls'
@@ -268,7 +267,7 @@ STORAGES = {
     },
     # CSS AND JS
     'staticfiles': {
-        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+        'BACKEND': 'storages.backends.s3boto3.S3StaticStorage',
     },
 }
 
