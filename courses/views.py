@@ -146,7 +146,7 @@ def mercado_pago_webhook(request):
                 Enrollment.objects.create(user=user_payer, course=course)
 
                 return HttpResponse(status=200, content='payment')
-        return HttpResponse(status=400)
+        return HttpResponse(status=200)
     else:
         return HttpResponse(status=405)
 
