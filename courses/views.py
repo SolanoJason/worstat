@@ -119,8 +119,10 @@ def mercado_pago_webhook(request):
                     course_id = items[0].get('id')
                     course = Course.objects.get(pk=course_id)
                     user_payer = User.objects.get(email=payer_email)
-                    Enrollment.objects.create(user=user_payer, course=course)
-
+                    try:
+                        Enrollment.objects.create(user=user_payer, course=course)
+                    except:
+                        pass
                     return HttpResponse(status=200, content='merchant_order')
         if request.GET.get('type') == 'payment':
             id = request.GET.get('data.id')
@@ -143,7 +145,10 @@ def mercado_pago_webhook(request):
                 course_id = items[0].get('id')
                 course = Course.objects.get(pk=course_id)
                 user_payer = User.objects.get(email=payer_email)
-                Enrollment.objects.create(user=user_payer, course=course)
+                try:
+                    Enrollment.objects.create(user=user_payer, course=course)
+                except:
+                    pass
 
                 return HttpResponse(status=200, content='payment')
         return HttpResponse(status=200)
