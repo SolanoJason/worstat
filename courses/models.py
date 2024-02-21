@@ -2,8 +2,9 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from django.core.validators import MaxValueValidator, MinValueValidator
-from moviepy.editor import VideoFileClip
 from datetime import timedelta
+import cv2
+import datetime
 
 # Create your models here.
 
@@ -132,9 +133,11 @@ class Episode(models.Model):
 
     def get_duration(self):
         try:
-            with VideoFileClip(self.video.url) as video:
-                duration = int(video.duration)
-                return duration
+            data = cv2.VideoCapture(self.video.url)
+            frames = data.get(cv2.CAP_PROP_FRAME_COUNT) 
+            fps = data.get(cv2.CAP_PROP_FPS)
+            seconds = round(frames / fps) 
+            return seconds
         except Exception as e:
             print(f"Error calculating duration for {self.title}: {e}")
     

@@ -1,24 +1,30 @@
 # signals.py
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from moviepy.editor import VideoFileClip
 from .models import Episode, Course
 import mercadopago
 from django.conf import settings
+import cv2
+import datetime
 import json
 
 sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
 
 @receiver(post_save, sender=Episode)
 def update_episode_duration(sender, instance, **kwargs):
+    print('SIGNALSIGNALSIGNALSIGNALSIGNALSIGNALSIGNALSIGNALSIGNAL')
     if not instance.duration:
-        try:
-            with VideoFileClip(instance.video.url) as video:
-                duration = int(video.duration)
-                instance.duration = duration
-                instance.save(update_fields=['duration'])
-        except Exception as e:
-            print(f"Error calculating duration for {instance.title}: {e}")
+        data = cv2.VideoCapture(instance.video.url)
+        # count the number of frames 
+        print(f'{data=}')
+        frames = data.get(cv2.CAP_PROP_FRAME_COUNT) 
+        print(f'{frames=}')
+        fps = data.get(cv2.CAP_PROP_FPS)
+        print(f'{fps=}')
+        seconds = round(frames / fps) 
+        print(f'{seconds=}')
+        instance.duration = seconds
+        instance.save(update_fields=['duration'])
 
 @receiver(post_save, sender=Course)
 def update_course_preference(sender, instance, **kwargs):

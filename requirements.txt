@@ -51,11 +51,12 @@ MarkupSafe==2.1.3
 matplotlib-inline==0.1.6
 mdurl==0.1.2
 mercadopago==2.2.1
-moviepy==1.0.3
+moviepy==2.0.0.dev2
 ngrok==0.12.1
 numpy==1.26.3
 oauthlib==3.2.2
 opencv-python==4.9.0.80
+opencv-python-headless
 packaging==23.2
 parso==0.8.3
 pickleshare==0.7.5
