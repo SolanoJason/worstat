@@ -132,7 +132,7 @@ class Episode(models.Model):
 
     def get_duration(self):
         try:
-            with VideoFileClip(self.video.path) as video:
+            with VideoFileClip(self.video.url) as video:
                 duration = int(video.duration)
                 return duration
         except Exception as e:

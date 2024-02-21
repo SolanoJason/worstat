@@ -13,7 +13,7 @@ sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
 def update_episode_duration(sender, instance, **kwargs):
     if not instance.duration:
         try:
-            with VideoFileClip(instance.video.path) as video:
+            with VideoFileClip(instance.video.url) as video:
                 duration = int(video.duration)
                 instance.duration = duration
                 instance.save(update_fields=['duration'])
