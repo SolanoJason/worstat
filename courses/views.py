@@ -176,7 +176,7 @@ def exam_view(request, course_id):
             percentage_correct = (score / total_questions) * 100
         else:
             percentage_correct = 0
-
+        print(f'{percentage_correct=}')
         if percentage_correct >= 80:
             enrollment = Enrollment.objects.get(user=request.user, course=course)
             enrollment.is_completed = True
@@ -185,7 +185,7 @@ def exam_view(request, course_id):
             return redirect("courses:my-certificates")
         else:
             messages.info(request, f"Necesitas una puntuacion de al menos 80% para pasar el examen, solo obtuviste {percentage_correct:.1f}.%")
-            return redirect("courses:exam", course_id=course.id)
+            return redirect("courses:course-detail", pk=course.id)
 
         # Redirigir o renderizar resultados según sea necesario
         return render(request, 'courses/exam_result.html', {'course': course, 'score': score, 'percentage_correct': percentage_correct})
@@ -235,6 +235,7 @@ class ReviewCreateView(CreateView):
         
         course = Course.objects.get(pk=self.kwargs['pk'])
         if self.request.user.is_authenticated:
+            enrollment = Enrollment.objects.filter(user=self.request.user, course=course).first()
             
             preference_data = {
                 "items": [
@@ -269,6 +270,7 @@ class ReviewCreateView(CreateView):
             preference = preference_response["response"]
             print(f'{preference=}')
             context['preference'] = preference
+            context['enrollment'] = enrollment
         context["course"] = course
         context["reviews"] = Review.objects.filter(course=course)
         context['PUBLIC_KEY'] = settings.MERCADO_PAGO_PUBLIC_KEY

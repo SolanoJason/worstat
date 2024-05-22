@@ -5,6 +5,13 @@
     <div class="bg-gray-900 p-16">
         <h2 class="max-w-screen-xl mx-auto text-white font-bold text-5xl">Mis certificados</h2>
     </div>
+    <div class="w-full p-8">
+        <ul class="list-disc pl-5">
+            {% for message in messages %}
+            <li class="{{ message.tags }} text-gray-700">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    </div>
     <div class="mt-16">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mx-auto max-w-screen-xl">
             {% for enrollment in enrollments %}
@@ -15,7 +22,7 @@
                     <div>
                         <hr>
                         <div class="flex justify-between mt-4 items-center text-gray-500">
-                            <a href="{% url 'courses:certificate-pdf' pk=enrollment.course.pk %}" class="text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 sm:mr-2 lg:mr-4 focus:outline-none">
+                            <a href="{% url 'courses:certificate-pdf' pk=enrollment.pk %}" class="text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 sm:mr-2 lg:mr-4 focus:outline-none">
                                 Ver certificado
                             </a>
                             <div class="">

@@ -4,6 +4,13 @@
 {% block content %}
 <section class="bg-gray-700">
     <div class="max-w-screen-xl mx-auto text-white p-6 flex flex-wrap">
+        <div class="w-full">
+            <ul>
+                {% for message in messages %}
+                <li class="{{ message.tags }} p-2 bg-gray-800 rounded-lg mb-2">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
         <div class="w-1/2">
             <h1 class="text-3xl font-bold mb-4">{{ course.title }}</h1>
             <p class="text-lg mb-4">{{ course.description }}</p>
@@ -16,7 +23,7 @@
             <div>
                 {% if user in course.users.all %}
                     {% if is_completed %}
-                    <a href="{% url 'courses:certificate-pdf' pk=course.pk %}" class="text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 sm:mr-2 lg:mr-4 focus:outline-none">
+                    <a href="{% url 'courses:certificate-pdf' pk=enrollment.pk %}" class="text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 sm:mr-2 lg:mr-4 focus:outline-none">
                         Ver certificado
                     </a>
                     {% else %}
@@ -63,7 +70,7 @@
             <div class="flex text-center text-2xl justify-center items-center space-x-4 h-16">
                 <i class="fa-brands fa-whatsapp text-green-400"></i>
                 <div>
-                    910560156
+                    914201373
                 </div>
             </div>
         </div>
@@ -158,7 +165,7 @@
                                 </div>
                                 <!-- Modal body -->
                                 <div class="p-4 md:p-5 space-y-4">
-                                    <video controls preload="none" class="w-full h-auto max-w-full border border-gray-200 rounded-md" controlsList="nodownload">
+                                    <video id="video-{{ episode.pk }}" controls preload="none" class="w-full h-auto max-w-full border border-gray-200 rounded-md" controlsList="nodownload">
                                         <source src="{{ episode.video.url }}" type="video/mp4">
                                     </video>
                                 </div>
@@ -257,5 +264,43 @@
 </script>
 {% endif %}
 {% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+        // Select all modals
+        const modals = document.querySelectorAll('.fixed.top-0.left-0.right-0.z-50.hidden.w-full');
+
+        // Iterate over each modal to initialize and set the updateOnHide callback
+        modals.forEach(modal => {
+            const modalId = modal.id;
+
+            const modalElement = document.getElementById(modalId);
+            const modalInstance = new Modal(modalElement, {
+                onHide: () => {
+                    const v = modal.querySelector('video');
+                    v.pause();
+                    v.currentTime = 0;
+                }
+            });
+
+            // Attach event listeners to buttons that toggle the modal
+            const toggleButtons = document.querySelectorAll(`[data-modal-toggle="${modalId}"]`);
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    modalInstance.show();
+                });
+            });
+
+            // Attach event listeners to buttons that hide the modal
+            const hideButtons = document.querySelectorAll(`[data-modal-hide="${modalId}"]`);
+            hideButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    modalInstance.hide();
+                });
+            });
+        });
+    });
+</script>
+
 {% endblock script %}
 

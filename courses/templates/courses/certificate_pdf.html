@@ -207,7 +207,7 @@
 								<div
 									class="pm-certificate-name underline margin-0 col-xs-8 text-center"
 								>
-									<span class="pm-name-text bold">{{ enrollment.user.full_name }}</span>
+									<span class="pm-name-text bold">{% if enrollment.user.full_name %}{{enrollment.user.full_name}}{% else %}{{enrollment.user}}{% endif %}</span>
 								</div>
 								<div class="col-xs-2"><!-- LEAVE EMPTY --></div>
 							</div>
